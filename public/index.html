@@ -73,7 +73,7 @@
     <div id="bridgeOutput" class="hidden bg-orange-50 border border-orange-200 p-6 rounded-2xl space-y-4 shadow-sm">
       <div class="flex justify-between items-center border-b border-orange-200 pb-3">
         <div>
-          <span class="text-xs bg-orange-100 text-orange-700 border border-orange-200 px-2 py-1 rounded font-bold">AI Generated Bridge Course</span>
+          <span class="text-xs bg-orange-100 text-orange-700 border border-orange-200 px-2 py-1 rounded font-bold">Recommended Bridge Course</span>
           <h3 id="bridgeTitle" class="text-xl font-bold text-slate-900 mt-2">--</h3>
         </div>
         <button onclick="document.getElementById('bridgeOutput').classList.add('hidden')" class="text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
@@ -149,33 +149,83 @@
     }
 
     // 3. Frontend Simulator for Bridge Course Generation (Light Theme)
+    // 3. Frontend Simulator for Bridge Course Generation (Light Theme)
     function generateBridge(skillName) {
       document.getElementById('bridgeTitle').innerText = `Industry Bridge: ${skillName}`;
       
+      // Custom 4-Week Curriculums based on the specific skill clicked
+      const curriculums = {
+        "Battery Management Systems": [
+          { title: "Li-Ion Cell Architectures & Chemistry", lab: "Cell balancing simulator setup" },
+          { title: "BMS Hardware & Sensor Integration", lab: "Wiring and configuring a slave BMS board" },
+          { title: "State-of-Charge (SOC) Algorithms", lab: "Programming SOC estimators" },
+          { title: "Fault Detection & Thermal Runaway", lab: "Injecting overvoltage faults & thermal testing" }
+        ],
+        "EV Diagnostics": [
+          { title: "OBD-II & EV Specific Trouble Codes", lab: "Scanning live data streams on EV testbed" },
+          { title: "Inverter & Traction Motor Testing", lab: "Oscilloscope wave analysis on 3-phase motors" },
+          { title: "High-Voltage Isolation & Safety", lab: "Megger testing on HV cables" },
+          { title: "Live Vehicle Troubleshooting", lab: "Resolving simulated drivetrain errors" }
+        ],
+        "CAN Bus Protocol": [
+          { title: "Vehicle Network Topologies", lab: "Wiring CAN-H and CAN-L twisted pairs" },
+          { title: "CAN Frame Analysis & Decoding", lab: "Sniffing packets with CANalyzer" },
+          { title: "ECU Flashing & Calibration via CAN", lab: "Updating firmware over CAN network" },
+          { title: "Network Simulation & Fault Injection", lab: "Simulating node drops and arbitration loss" }
+        ],
+        "Battery Safety": [
+          { title: "High Voltage PPE & Compliance SOPs", lab: "Proper donning/doffing of Class 0 gloves" },
+          { title: "Thermal Runaway Mitigation", lab: "Deploying fire suppression systems" },
+          { title: "First Responder & Crash Protocols", lab: "Safe vehicle de-energization procedures" },
+          { title: "Safe Storage & Transport", lab: "Packaging end-of-life cells per regulations" }
+        ],
+        "Thermal Management": [
+          { title: "Active vs Passive Cooling Systems", lab: "Tear-down of EV cooling plates" },
+          { title: "Coolant Flow & Pump Diagnostics", lab: "Measuring flow rates and pressure drops" },
+          { title: "HVAC & Battery Thermal Sync", lab: "Testing cabin vs battery cooling loops" },
+          { title: "System Leak & Pressure Testing", lab: "Dye and vacuum testing on chiller units" }
+        ],
+        "AWS / Azure DevOps": [
+          { title: "Cloud Resource Provisioning", lab: "Setting up VPCs and IAM roles" },
+          { title: "CI/CD Pipeline Automation", lab: "Building Jenkins/GitHub Actions workflows" },
+          { title: "Infrastructure as Code (IaC)", lab: "Deploying resources using Terraform" },
+          { title: "Cloud Monitoring & Alerting", lab: "Configuring CloudWatch and Azure Monitor" }
+        ],
+        "Docker & Kubernetes": [
+          { title: "Containerization Fundamentals", lab: "Writing Dockerfiles and building images" },
+          { title: "Multi-Container Orchestration", lab: "Deploying apps with Docker Compose" },
+          { title: "K8s Cluster Networking & Pods", lab: "Configuring Services and Ingress controllers" },
+          { title: "Helm Charts & Auto-Scaling", lab: "Deploying scalable apps with Helm" }
+        ],
+        "Cybersecurity Incident Handling": [
+          { title: "Threat Landscape & SIEM Setup", lab: "Ingesting logs into Splunk/ELK" },
+          { title: "Network Forensics & Packet Analysis", lab: "Analyzing pcap files with Wireshark" },
+          { title: "Malware Containment & Eradication", lab: "Sandboxing and analyzing suspicious files" },
+          { title: "Red/Blue Team Attack Simulation", lab: "Defending against live simulated breaches" }
+        ]
+      };
+
+      // Fallback for any skill that doesn't have a hardcoded match above
+      const defaultModules = [
+        { title: `Core Principles of ${skillName}`, lab: "Industry standard tools & setup" },
+        { title: "Advanced Application & Integration", lab: "Live workflow simulation" },
+        { title: "Diagnostics & Troubleshooting", lab: "Resolving simulated operational errors" },
+        { title: "Project & Assessment", lab: "Final Industry Certification Evaluation" }
+      ];
+
+      const selectedModules = curriculums[skillName] || defaultModules;
+
       const modulesContainer = document.getElementById('bridgeModules');
-      modulesContainer.innerHTML = `
+      modulesContainer.innerHTML = selectedModules.map((mod, index) => `
         <div class="bg-white p-3 rounded-lg border border-orange-100 shadow-sm">
-          <p class="text-orange-700 font-bold">Week 1: Fundamentals of ${skillName}</p>
-          <p class="text-slate-600 text-xs mt-1 font-medium">🛠️ Lab: Tools Setup & Industry Safety Standards</p>
+          <p class="text-orange-700 font-bold">Week ${index + 1}: ${mod.title}</p>
+          <p class="text-slate-600 text-xs mt-1 font-medium">🛠️ Lab: ${mod.lab}</p>
         </div>
-        <div class="bg-white p-3 rounded-lg border border-orange-100 shadow-sm">
-          <p class="text-orange-700 font-bold">Week 2: Component Architecture</p>
-          <p class="text-slate-600 text-xs mt-1 font-medium">🛠️ Lab: Live Diagnostics and Testing Protocols</p>
-        </div>
-        <div class="bg-white p-3 rounded-lg border border-orange-100 shadow-sm">
-          <p class="text-orange-700 font-bold">Week 3: Fault Resolution</p>
-          <p class="text-slate-600 text-xs mt-1 font-medium">🛠️ Lab: Troubleshooting Simulated Errors</p>
-        </div>
-        <div class="bg-white p-3 rounded-lg border border-orange-100 shadow-sm">
-          <p class="text-orange-700 font-bold">Week 4: Project & Assessment</p>
-          <p class="text-slate-600 text-xs mt-1 font-medium">🛠️ Lab: Final Industry Certification Evaluation</p>
-        </div>
-      `;
+      `).join('');
 
       document.getElementById('bridgeOutput').classList.remove('hidden');
       document.getElementById('bridgeOutput').scrollIntoView({ behavior: 'smooth' });
     }
-
     // Run automatically on page load
     window.onload = runAnalysis;
   </script>
