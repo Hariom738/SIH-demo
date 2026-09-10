@@ -3,79 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkillPulse AI - Prototype</title>
+  <title>SkillPulse AI</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-6 font-sans">
+<body class="bg-slate-50 text-slate-900 font-sans min-h-screen">
 
-  <div class="max-w-6xl mx-auto">
-    <!-- Header -->
-    <header class="flex justify-between items-center border-b border-slate-800 pb-4 mb-6">
-      <div>
-        <h1 class="text-2xl font-bold text-orange-500">SkillPulse AI</h1>
-        <p class="text-xs text-slate-400">Phase 1: Dynamic Skill Demand Radar & Curriculum Gap Detector</p>
+  <!-- Header -->
+  <header class="border-b border-slate-200 bg-white/80 sticky top-0 z-50 backdrop-blur shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-orange-600 flex items-center justify-center font-bold text-xl text-white">MH</div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight text-slate-800">SkillSync Maharashtra</h1>
+          <p class="text-xs text-slate-500">Phase 1: Stateless Intelligence Pipeline Active</p>
+        </div>
       </div>
-      <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full">
-        Stateless Intelligence Pipeline
-      </span>
-    </header>
+      <div class="flex items-center space-x-2 text-xs bg-emerald-50 px-3 py-1.5 rounded-full text-emerald-700 border border-emerald-200 font-medium">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>Engine Online</span>
+      </div>
+    </div>
+  </header>
 
+  <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+    
     <!-- Filters -->
-    <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex gap-4 mb-6 items-end">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
       <div>
-        <label class="text-xs text-slate-400 block mb-1">Select Cluster</label>
-        <select id="sectorSelect" class="bg-slate-800 border border-slate-700 text-sm rounded p-2 text-slate-200">
-          <option value="pune_ev">Automotive & EV (Pune)</option>
-          <option value="mumbai_it">IT & Cloud Services (Mumbai)</option>
+        <label class="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-1">Select Industrial Hub & Sector</label>
+        <select id="sectorSelect" onchange="runAnalysis()" class="bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 shadow-sm">
+          <option value="pune_ev">Automotive & EV Cluster (Pune / Chakan)</option>
+          <option value="mumbai_it">IT & Cloud Services (Mumbai / Hinjawadi)</option>
         </select>
       </div>
-      <button onclick="runAnalysis()" class="bg-orange-600 hover:bg-orange-500 text-white font-bold text-sm px-4 py-2 rounded">
+      <button onclick="runAnalysis()" class="bg-orange-600 hover:bg-orange-500 text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors shadow-sm">
         Analyze Workflow
       </button>
     </div>
 
-    <!-- Dashboard Content -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       
       <!-- Skill Demand Radar -->
-      <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
-        <h2 class="text-base font-bold text-orange-400 mb-4">Dynamic Skill Demand Radar</h2>
+      <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+        <h2 class="text-base font-bold text-orange-600 mb-4">Dynamic Skill Demand Radar</h2>
         <div id="radarContainer" class="space-y-3"></div>
       </div>
 
-   <div class="overflow-x-auto">
-  <table class="w-full text-left text-xs">
-    <thead class="bg-slate-900/60 text-slate-400 uppercase border-b border-slate-700">
-      <tr>
-        <th class="py-3 px-3">Skill Cluster</th>
-        <th class="py-3 px-2">Demand</th>
-        <th class="py-3 px-2">Coverage</th>
-        <th class="py-3 px-2">Action</th>
-      </tr>
-    </thead>
-    <tbody id="skillsTableBody" class="divide-y divide-slate-700/50"></tbody>
-  </table>
-</div>
-function renderTable(skills) {
-  const tbody = document.getElementById('skillsTableBody');
-  tbody.innerHTML = skills.map(s => {
-    const isGap = s.currentCoverage < 50;
-    return `
-      <tr class="hover:bg-slate-700/30">
-        <td class="py-3 px-3 font-medium text-slate-200">${s.skill}</td>
-        <td class="py-3 px-2 text-slate-300">${s.demandScore}%</td>
-        <td class="py-3 px-2">
-          <span class="px-2 py-0.5 rounded text-[10px] ${isGap ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">
-            ${s.currentCoverage}% Covered
-          </span>
-        </td>
-        <td class="py-3 px-2">
-          ${isGap ? `<button onclick="generateBridge('${s.skill}')" class="bg-orange-600 hover:bg-orange-500 text-white text-[10px] px-2.5 py-1 rounded">Gen Bridge</button>` : `<span class="text-slate-500">OK</span>`}
-        </td>
-      </tr>
-    `;
-  }).join('');
-}    
+      <!-- Identified Skill Clusters Table -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h3 class="text-base font-bold text-sky-600">Curriculum Gap Detector</h3>
+        <div class="overflow-x-auto rounded-lg border border-slate-200">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 text-slate-600 uppercase border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-3 font-bold">Skill Cluster</th>
+                <th class="py-3 px-2 font-bold">Demand Score</th>
+                <th class="py-3 px-2 font-bold">Coverage Status</th>
+                <th class="py-3 px-2 font-bold">Action</th>
+              </tr>
+            </thead>
+            <tbody id="skillsTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- AI Bridge Course Output -->
+    <div id="bridgeOutput" class="hidden bg-orange-50 border border-orange-200 p-6 rounded-2xl space-y-4 shadow-sm">
+      <div class="flex justify-between items-center border-b border-orange-200 pb-3">
+        <div>
+          <span class="text-xs bg-orange-100 text-orange-700 border border-orange-200 px-2 py-1 rounded font-bold">AI Generated Bridge Course</span>
+          <h3 id="bridgeTitle" class="text-xl font-bold text-slate-900 mt-2">--</h3>
+        </div>
+        <button onclick="document.getElementById('bridgeOutput').classList.add('hidden')" class="text-slate-400 hover:text-slate-700 text-xl font-bold">✕</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
+        <p><strong class="text-slate-900">Duration:</strong> <span id="bridgeDuration">4 Weeks (30 Hours Practical / 10 Hours Theory)</span></p>
+        <p><strong class="text-slate-900">Prerequisites:</strong> <span id="bridgePrereq">Basic Core Knowledge & Lab Safety</span></p>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">Accelerated Curriculum Modules</h4>
+        <div id="bridgeModules" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm"></div>
+      </div>
+    </div>
+
+  </main>
+
   <script>
     async function runAnalysis() {
       const sectorKey = document.getElementById('sectorSelect').value;
@@ -88,16 +104,16 @@ function renderTable(skills) {
 
       const data = await response.json();
 
-     
+      // 1. Render Demand Radar (Light Theme)
       const radarContainer = document.getElementById('radarContainer');
       radarContainer.innerHTML = data.demandRadar.map(item => `
-        <div class="bg-slate-800/50 p-3 rounded border border-slate-700/50">
-          <div class="flex justify-between font-semibold text-sm">
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 shadow-sm">
+          <div class="flex justify-between font-bold text-sm text-slate-800">
             <span>${item.skill}</span>
-            <span class="text-orange-400">${item.forecastScore} Score</span>
+            <span class="text-orange-600">${item.forecastScore} Score</span>
           </div>
-          <p class="text-xs text-emerald-400 mt-0.5">${item.indicator}</p>
-          <div class="grid grid-cols-4 gap-1 text-[10px] text-slate-400 mt-2 bg-slate-950 p-1.5 rounded text-center">
+          <p class="text-xs text-emerald-600 font-semibold mt-0.5">${item.indicator}</p>
+          <div class="grid grid-cols-4 gap-1 text-[10px] text-slate-600 font-medium mt-2 bg-white border border-slate-100 p-2 rounded text-center shadow-inner">
             <div>Hist: ${item.breakdown.hist}</div>
             <div>Trend: ${item.breakdown.trend}</div>
             <div>Growth: ${item.breakdown.growth}</div>
@@ -106,36 +122,62 @@ function renderTable(skills) {
         </div>
       `).join('');
 
-     
-      const gapContainer = document.getElementById('gapContainer');
-      gapContainer.innerHTML = data.demandRadar.map(item => {
-        let badgeClass = "bg-red-500/20 text-red-400";
-        if (item.status === "Covered") badgeClass = "bg-emerald-500/20 text-emerald-400";
-        if (item.status === "Partial") badgeClass = "bg-amber-500/20 text-amber-400";
+      // 2. Render Integrated Table (Light Theme)
+      const tbody = document.getElementById('skillsTableBody');
+      tbody.innerHTML = data.demandRadar.map(s => {
+        const isGap = s.status === "Missing" || s.status === "Partial";
+        
+        let badgeClass = "bg-red-100 text-red-700 border border-red-200";
+        if (s.status === "Covered") badgeClass = "bg-emerald-100 text-emerald-700 border border-emerald-200";
+        if (s.status === "Partial") badgeClass = "bg-amber-100 text-amber-700 border border-amber-200";
 
         return `
-          <div class="flex justify-between items-center bg-slate-800/30 p-2.5 rounded border border-slate-800">
-            <div>
-              <p class="text-xs font-semibold">${item.skill}</p>
-              <p class="text-[10px] text-slate-400">${item.why}</p>
-            </div>
-            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${badgeClass}">${item.status}</span>
-          </div>
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="py-3 px-3 font-semibold text-slate-800">${s.skill}</td>
+            <td class="py-3 px-2 text-slate-700 font-bold">${s.forecastScore}</td>
+            <td class="py-3 px-2">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${badgeClass}">
+                ${s.matchScore}% - ${s.status}
+              </span>
+            </td>
+            <td class="py-3 px-2">
+              ${isGap ? `<button onclick="generateBridge('${s.skill}')" class="bg-orange-600 hover:bg-orange-700 text-white text-[11px] px-3 py-1.5 rounded shadow-sm font-bold transition-colors">Gen Bridge</button>` : `<span class="text-slate-400 font-bold px-2">OK</span>`}
+            </td>
+          </tr>
         `;
       }).join('');
-
-     
-      const recContainer = document.getElementById('recContainer');
-      recContainer.innerHTML = data.recommendations.map(rec => `
-        <div class="bg-orange-950/20 border border-orange-500/30 p-2.5 rounded text-xs">
-          <p class="font-bold text-orange-400">${rec.moduleTitle}</p>
-          <p class="text-slate-300 mt-0.5">${rec.recommendedAction}</p>
-        </div>
-      `).join('');
     }
 
- 
-    runAnalysis();
+    // 3. Frontend Simulator for Bridge Course Generation (Light Theme)
+    function generateBridge(skillName) {
+      document.getElementById('bridgeTitle').innerText = `Industry Bridge: ${skillName}`;
+      
+      const modulesContainer = document.getElementById('bridgeModules');
+      modulesContainer.innerHTML = `
+        <div class="bg-white p-3 rounded-lg border border-orange-100 shadow-sm">
+          <p class="text-orange-700 font-bold">Week 1: Fundamentals of ${skillName}</p>
+          <p class="text-slate-600 text-xs mt-1 font-medium">🛠️ Lab: Tools Setup & Industry Safety Standards</p>
+        </div>
+        <div class="bg-white p-3 rounded-lg border border-orange-100 shadow-sm">
+          <p class="text-orange-700 font-bold">Week 2: Component Architecture</p>
+          <p class="text-slate-600 text-xs mt-1 font-medium">🛠️ Lab: Live Diagnostics and Testing Protocols</p>
+        </div>
+        <div class="bg-white p-3 rounded-lg border border-orange-100 shadow-sm">
+          <p class="text-orange-700 font-bold">Week 3: Fault Resolution</p>
+          <p class="text-slate-600 text-xs mt-1 font-medium">🛠️ Lab: Troubleshooting Simulated Errors</p>
+        </div>
+        <div class="bg-white p-3 rounded-lg border border-orange-100 shadow-sm">
+          <p class="text-orange-700 font-bold">Week 4: Project & Assessment</p>
+          <p class="text-slate-600 text-xs mt-1 font-medium">🛠️ Lab: Final Industry Certification Evaluation</p>
+        </div>
+      `;
+
+      document.getElementById('bridgeOutput').classList.remove('hidden');
+      document.getElementById('bridgeOutput').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Run automatically on page load
+    window.onload = runAnalysis;
   </script>
 </body>
 </html>
