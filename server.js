@@ -1,8 +1,7 @@
-// server.js - SkillSync Maharashtra API Engine
+// server.js - SkillPulse AI Engine (Phase 1)
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
 const path = require('path');
 
 const app = express();
@@ -10,128 +9,103 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 1. In-Memory Local Database (Guarantees data loads offline or online)
-const LOCAL_DATA = {
-  pune_auto: {
-    sectorName: "Automotive & EV Cluster (Pune / Chakan)",
-    governingBody: "DVET Maharashtra / ITI Pune",
-    targetSyllabus: "Diploma in Mechanical & Automobile Engineering (2021 Revised)",
-    industryDemand: [
-      { skill: "Battery Management Systems (BMS)", demandScore: 95, currentCoverage: 20, status: "Critical Gap" },
-      { skill: "PLC & Industrial Automation", demandScore: 90, currentCoverage: 75, status: "Moderate Alignment" },
-      { skill: "CAN Protocol & Vehicle Electronics", demandScore: 88, currentCoverage: 15, status: "Critical Gap" },
-      { skill: "CNC Machine Operation", demandScore: 80, currentCoverage: 85, status: "Aligned" },
-      { skill: "EV Safety & High Voltage Protocols", demandScore: 92, currentCoverage: 30, status: "Critical Gap" }
-    ]
+// 1. Phase 1 Data Source (Stateless Intelligence Pipeline)
+const SECTOR_DATABASE = {
+  pune_ev: {
+    sectorName: "Automotive & EV Cluster",
+    location: "Pune / Chakan",
+    course: "Diploma in EV Tech",
+    industrySkills: [
+      { skill: "Battery Management Systems", hist: 64, trend: 82, growth: 91, tech: 88 },
+      { skill: "EV Diagnostics", hist: 70, trend: 85, growth: 89, tech: 84 },
+      { skill: "CAN Bus Protocol", hist: 75, trend: 78, growth: 85, tech: 82 },
+      { skill: "Battery Safety", hist: 60, trend: 75, growth: 88, tech: 80 },
+      { skill: "Thermal Management", hist: 55, trend: 70, growth: 82, tech: 75 }
+    ],
+    courseSkills: ["Battery Basics", "Electrical Systems", "Vehicle Diagnostics", "Motor Systems", "Basic Safety"]
   },
   mumbai_it: {
-    sectorName: "IT & Cloud Services (Mumbai / Hinjawadi)",
-    governingBody: "MSBTE Maharashtra",
-    targetSyllabus: "Diploma in Computer Engineering (2022 Scheme)",
-    industryDemand: [
-      { skill: "Cloud Native & AWS/Azure DevOps", demandScore: 98, currentCoverage: 35, status: "Critical Gap" },
-      { skill: "Docker & Kubernetes Containerization", demandScore: 92, currentCoverage: 10, status: "Critical Gap" },
-      { skill: "Java / Python Data Structures", demandScore: 85, currentCoverage: 90, status: "Aligned" },
-      { skill: "Cybersecurity Incident Handling", demandScore: 89, currentCoverage: 25, status: "Critical Gap" },
-      { skill: "Full Stack React / Node Development", demandScore: 94, currentCoverage: 60, status: "Moderate Alignment" }
-    ]
-  },
-  aurangabad_pharma: {
-    sectorName: "Pharma & Biotech (Chhatrapati Sambhajinagar)",
-    governingBody: "MSSDS / ITI Chemical Tech",
-    targetSyllabus: "Certificate in Industrial Chemical Processing",
-    industryDemand: [
-      { skill: "HPLC Analysis & Chromatography", demandScore: 96, currentCoverage: 45, status: "Critical Gap" },
-      { skill: "Good Manufacturing Practice (GMP) 2.0", demandScore: 90, currentCoverage: 80, status: "Aligned" },
-      { skill: "Automated Process Control Systems", demandScore: 87, currentCoverage: 30, status: "Critical Gap" },
-      { skill: "Pharma Regulatory Compliance (FDA)", demandScore: 85, currentCoverage: 50, status: "Moderate Alignment" }
-    ]
+    sectorName: "IT & Cloud Services",
+    location: "Mumbai / Hinjawadi",
+    course: "Diploma in Computer Tech",
+    industrySkills: [
+      { skill: "AWS / Azure DevOps", hist: 70, trend: 90, growth: 95, tech: 92 },
+      { skill: "Docker & Kubernetes", hist: 60, trend: 88, growth: 92, tech: 90 },
+      { skill: "Cybersecurity Incident Handling", hist: 65, trend: 80, growth: 85, tech: 88 },
+      { skill: "Java / Data Structures", hist: 85, trend: 70, growth: 75, tech: 70 }
+    ],
+    courseSkills: ["Java / Data Structures", "Basic Networking", "Operating Systems", "Web Development"]
   }
 };
 
-let isMongoConnected = false;
+// 2. Skill Intelligence Engine: Forecast Score Formula
+function calculateForecastSignal(hist, trend, growth, tech) {
+  // Weighted Average: 25% Hist, 35% Trend, 20% Growth, 20% Tech
+  const score = Math.round((hist * 0.25) + (trend * 0.35) + (growth * 0.20) + (tech * 0.20));
+  let indicator = "Stable Demand";
+  if (score >= 80) indicator = "Strong Emerging Demand";
+  else if (score >= 60) indicator = "Moderate Growing Demand";
 
-// 2. MongoDB Schema Setup
-const skillSchema = new mongoose.Schema({
-  skill: String,
-  demandScore: Number,
-  currentCoverage: Number,
-  status: String
-});
-
-const sectorSchema = new mongoose.Schema({
-  sectorId: { type: String, unique: true },
-  sectorName: String,
-  governingBody: String,
-  targetSyllabus: String,
-  industryDemand: [skillSchema]
-});
-
-const Sector = mongoose.model('Sector', sectorSchema);
-
-// Attempt Cloud Connection
-if (process.env.MONGODB_URI) {
-  mongoose.connect(process.env.MONGODB_URI)
-    .then(() => {
-      console.log('✅ Connected to MongoDB Cloud');
-      isMongoConnected = true;
-    })
-    .catch(() => {
-      console.log('⚡ Running in High-Speed Local In-Memory Mode');
-    });
-} else {
-  console.log('⚡ Running in High-Speed Local In-Memory Mode');
+  return { score, indicator };
 }
 
-// 3. Analytics Endpoint
-app.get('/api/analytics/:sectorId', async (req, res) => {
-  try {
-    let data = null;
+// 3. Curriculum Engine: Gap Detector & Matching
+function detectCurriculumGaps(industrySkills, courseSkills) {
+  const courseLower = courseSkills.map(c => c.toLowerCase());
 
-    if (isMongoConnected) {
-      data = await Sector.findOne({ sectorId: req.params.sectorId });
+  return industrySkills.map(item => {
+    const forecast = calculateForecastSignal(item.hist, item.trend, item.growth, item.tech);
+    const skillLower = item.skill.toLowerCase();
+
+    let status = "Missing";
+    let matchScore = 0;
+
+    if (courseLower.includes(skillLower)) {
+      status = "Covered";
+      matchScore = 100;
+    } else if (courseLower.some(c => c.includes(skillLower) || skillLower.includes(c))) {
+      status = "Partial";
+      matchScore = 50;
     }
 
-    // Fallback to local data if Mongo is not connected or returns nothing
-    if (!data) {
-      data = LOCAL_DATA[req.params.sectorId] || LOCAL_DATA.pune_auto;
-    }
+    return {
+      skill: item.skill,
+      forecastScore: forecast.score,
+      indicator: forecast.indicator,
+      status: status,
+      matchScore: matchScore,
+      breakdown: { hist: item.hist, trend: item.trend, growth: item.growth, tech: item.tech },
+      why: `Job Demand: ${item.trend}%, Growth: ${item.growth}%, Tech Signal: ${item.tech}%`
+    };
+  });
+}
 
-    const totalDemand = data.industryDemand.reduce((sum, item) => sum + item.demandScore, 0);
-    const totalCoverage = data.industryDemand.reduce((sum, item) => sum + (item.demandScore * (item.currentCoverage / 100)), 0);
-    const alignmentScore = Math.round((totalCoverage / totalDemand) * 100);
-    const gaps = data.industryDemand.filter(item => item.currentCoverage < 50);
+// 4. API Endpoints
+app.post('/api/analyze', (req, res) => {
+  const sectorKey = req.body.sectorKey || "pune_ev";
+  const sectorData = SECTOR_DATABASE[sectorKey] || SECTOR_DATABASE.pune_ev;
 
-    res.json({
-      sector: data.sectorName,
-      governingBody: data.governingBody,
-      targetSyllabus: data.targetSyllabus,
-      alignmentScore,
-      totalSkillsTracked: data.industryDemand.length,
-      criticalGapCount: gaps.length,
-      skills: data.industryDemand
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Server Error" });
-  }
-});
+  const gapAnalysis = detectCurriculumGaps(sectorData.industrySkills, sectorData.courseSkills);
+  
+  const missingSkills = gapAnalysis.filter(g => g.status === "Missing" || g.status === "Partial");
+  const recommendations = missingSkills.map(m => ({
+    moduleTitle: `4-Week Micro-Bridge: ${m.skill}`,
+    recommendedAction: `Incorporate practical laboratory modules for ${m.skill} into current curriculum.`
+  }));
 
-// 4. Bridge Course Endpoint
-app.post('/api/generate-bridge', (req, res) => {
-  const { skillName, targetSector } = req.body;
   res.json({
-    title: `4-Week Industry Bridge: ${skillName}`,
-    duration: "4 Weeks (30 Hours Practical / 10 Hours Theory)",
-    targetSector,
-    prerequisites: "Basic ITI / Polytechnic Diploma Core Knowledge",
-    modules: [
-      { week: 1, topic: "Fundamentals & Industry Standard Protocols", practicals: "Simulated Lab Setup & Safety Training" },
-      { week: 2, topic: "Tooling, Diagnostics & Real-world Workflows", practicals: "Hands-on Equipment Calibration & Diagnostics" },
-      { week: 3, topic: "Live Case Studies & Fault Injection Scenarios", practicals: "Troubleshooting Industry Simulation Kits" },
-      { week: 4, topic: "Industry Assessment & MSSDS Micro-Credentialing", practicals: "Final Evaluation by Empaneled Industry Partner" }
-    ]
+    sectorName: sectorData.sectorName,
+    location: sectorData.location,
+    course: sectorData.course,
+    demandRadar: gapAnalysis,
+    recommendations: recommendations
   });
 });
 
+// Serve frontend homepage
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 SkillSync Engine running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`🚀 SkillPulse AI running on http://localhost:${PORT}`));
